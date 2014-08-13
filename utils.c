@@ -1,8 +1,9 @@
 #include "headers.h"
 
-void init_f(float* f0, float* f1, float* f2, float* f3, float* f4, 
+void initF(float* f0, float* f1, float* f2, float* f3, float* f4, 
 	float* f5, float* f6, float* f7, float* f8, int* solid, int totpoints, float vxin, float roout){
 
+	float faceq1, faceq2, faceq3;
 	faceq1 = 4.f/9.f;
     faceq2 = 1.f/9.f;
     faceq3 = 1.f/36.f;
@@ -23,7 +24,28 @@ void init_f(float* f0, float* f1, float* f2, float* f3, float* f4,
     }
 }
 
-void stream( ?????????? ){
+void drawBody(float cx, float cy, float r, int num_segments)
+{ 
+	int i, j, ii, i0; 
+	for(ii = 0; ii < num_segments; ii++) 
+	{ 
+		float theta = 2.0f * 3.1415926f * ii / num_segments;//get the current angle 
+
+		float x = r * cosf(theta);//calculate the x component
+		float y = r * sinf(theta);//calculate the y component
+
+		i = x+cx;
+		j = y+cy;
+
+		i0 = I2D(ni, i, j);
+		solid[i0] = 0;
+
+	}
+}
+
+void stream(float *tmpf0, float* tmpf1, float *tmpf2, float *tmpf3, float *tmpf4, float *tmpf5, float *tmpf6,
+				 float *tmpf7, float *tmpf8, float *f0, float *f1, float *f2, float *f3, float *f4, float *f5,
+				 		float *f6, float *f7, float *f8, int ni, int nj){
 
 // Move the f values one grid spacing in the directions that they are pointing
 // i.e. f1 is copied one location to the right, etc.
@@ -69,7 +91,8 @@ void stream( ?????????? ){
     }
 }
 
-void collide( ???????? ){
+void collide(int ni, int nj, float *u, float *v, float *f0, float *f1, float *f2, float *f3, 
+				float *f4, float *f5, float *f6, float *f7, float *f8, float tau){
 
 // Collisions between the particles are modeled here. We use the very simplest
 // model which assumes the f's change toward the local equlibrium value (based
@@ -129,7 +152,7 @@ void collide( ???????? ){
     }
 }
 
-void in_BC( ????????? ){
+void in_BC(float vxin, float roout, int ni, int nj, float *f1, float *f5, float *f8){
 
 // This inlet BC is extremely crude but is very stable
 // We set the incoming f values to the equilibirum values assuming:
@@ -137,6 +160,10 @@ void in_BC( ????????? ){
 
     int i0, j;
     float f1new, f5new, f8new, vx_term;
+    float faceq1, faceq2, faceq3;
+	faceq1 = 4.f/9.f;
+    faceq2 = 1.f/9.f;
+    faceq3 = 1.f/36.f;
 
     vx_term = 1.f + 3.f*vxin +3.f*vxin*vxin;
     f1new = roout * faceq2 * vx_term;
@@ -151,7 +178,8 @@ void in_BC( ????????? ){
     }
 }
 
-void solid_BC( ??????? ){
+void solid_BC(float* f0, float* f1, float* f2, float* f3, float* f4, float* f5, float* f6,
+				 float* f7, float* f8, int ni, int nj){
 
 // This is the boundary condition for a solid node. All the f's are reversed -
 // this is known as "bounce-back"
@@ -182,22 +210,5 @@ void solid_BC( ??????? ){
 			f8[i0] = f6old;
 		    }
 		}
-    }
-}
-
-void ex_BC_crude( ???????? ){
-
-// This is the very simplest (and crudest) exit BC. All the f values pointing
-// into the domain at the exit (ni-1) are set equal to those one node into
-// the domain (ni-2)
-
-    int i0, i1, j;
-
-    for (j=0; j<nj; j++){
-		i0 = I2D(ni,ni-1,j);
-		i1 = i0 - 1;
-		f3[i0] = f3[i1];
-		f6[i0] = f6[i1];
-		f7[i0] = f7[i1];
     }
 }

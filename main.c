@@ -14,12 +14,13 @@ int main(){
 	//Declaring variables and arrays
 	float *f0,*f1,*f2,*f3,*f4,*f5,*f6,*f7,*f8;
 	float *tmpf0,*tmpf1,*tmpf2,*tmpf3,*tmpf4,*tmpf5,*tmpf6,*tmpf7,*tmpf8;
+    float *u, *w;
 
 	//Declaring variables
-	float tau,faceq1,faceq2,faceq3, re, fx, fy, cd, cl, ro; 
-	float vxin, roout, dia;
+	float tau, re, fx, fy, cd, cl, ro; 
+	float vxin, roout, dia, temp_rad;
 	float width, height;
-	int ni,nj;
+	int ni, nj, tstep;
 	int ncol;
 	int ipos_old,jpos_old, draw_solid_flag;
 	int array_size_2d, totpoints, i;
@@ -27,6 +28,7 @@ int main(){
 	//Initializing basic properties of problem and fluid
 	ni = 400;
     nj = 240;
+    tstep = 1000;
     roout = 1.0;
     dia = 24.0;
     tau= 0.51;
@@ -58,11 +60,31 @@ int main(){
     tmpf7 = malloc(array_size_2d);
     tmpf8 = malloc(array_size_2d);
     solid = malloc(ni*nj*sizeof(int));
+    u = malloc(array_size_2d);
+    w = malloc(array_size_2d);
 
     //Initialize 'f' values
-    Init_f(f0, f1, f2, f3, f4, f5, f6, f7, f8, solid, totpoints, vxin, roout);
+    InitF(f0, f1, f2, f3, f4, f5, f6, f7, f8, solid, totpoints, vxin, roout);
 
-    
+    //Draw the solid body
+    for(temp_rad=1.0; temp_rad<=dia/2; temp_rad++){
+        drawBody(40.0, 120.0, temp_rad, temp_rad*temp_rad*10);
+    }
+
+    while(tstep--){
+        //streaming function
+        stream(tmpf0, tmpf1, tmpf2, tmpf3, tmpf4, tmpf5, tmpf6, tmpf7, tmpf8,
+                    f0, f1, f2, f3, f4, f5, f6, f7, f8, ni, nj);
+        //solid boundary condition
+        solid_BC(f0, f1, f2, f3, f4, f5, f6, f7, f8, ni, nj);
+        //inlet boundary condition
+        in_BC(vxin, roout, ni, nj, f1, f5, f8);
+        //collision step
+        collide(ni, nj, u, v, f0, f1, f2, f3, f4, f5, f6, f7, f8, tau);
+
+        //write data in to files
+        
+    }
 
 	return 0;
 }
