@@ -3,6 +3,7 @@
 void initF(float* f0, float* f1, float* f2, float* f3, float* f4, 
 	float* f5, float* f6, float* f7, float* f8, int* solid, int totpoints, float vxin, float roout){
 
+//Initialize the f values
 	float faceq1, faceq2, faceq3;
 	faceq1 = 4.f/9.f;
     faceq2 = 1.f/9.f;
@@ -24,8 +25,10 @@ void initF(float* f0, float* f1, float* f2, float* f3, float* f4,
     }
 }
 
-void drawBody(float cx, float cy, float r, int num_segments)
-{ 
+void drawBody(float cx, float cy, float r, int num_segments){
+
+//Draw the solid cylinder
+
 	int i, j, ii, i0; 
 	for(ii = 0; ii < num_segments; ii++) 
 	{ 
